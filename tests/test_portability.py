@@ -1,4 +1,4 @@
-"""Run with: python3 -m unittest discover -s tests -v
+"""Run with: python3 -B tools/run_tests.py --pattern test_portability.py
 
 Only synthetic files and fake external-tool executables are used; no malware.
 """
@@ -13,9 +13,7 @@ import sys
 import tempfile
 import unittest
 import zipfile
-
-SOURCE = Path(__file__).resolve().parents[1]
-
+from build_usb import source_file
 
 class PortableAuditTests(unittest.TestCase):
     def setUp(self):
@@ -23,7 +21,7 @@ class PortableAuditTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         for name in ['scan_library.py', 'audit_materials.py', 'sanitize_with_dangerzone.py', 'library_paths.py', 'library_style.py', 'library_records.py', 'intake_workflow.py', 'catalogue_settings.py', 'operation_progress.py']:
-            shutil.copy2(SOURCE / name, self.root / name)
+            shutil.copy2(source_file(name), self.root / name)
         (self.root / 'Incoming').mkdir()
         (self.root / 'Books' / 'Notes').mkdir(parents=True)
         (self.root / 'Incoming' / 'mismatch.pdf').write_bytes(b'MZnot a pdf')

@@ -24,9 +24,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Run all synthetic cases with isolated native Tk
-        run: python -B run_tests.py --report-json "${{ runner.temp }}/tests.json"
+        run: python -B tools/run_tests.py --report-json "${{ runner.temp }}/tests.json"
       - name: Build and inspect the actual distribution; test disposable installation
-        run: python -B release_gate.py --output "${{ runner.temp }}/pinakeys-package-gate"
+        run: python -B tools/release_gate.py --output "${{ runner.temp }}/pinakeys-package-gate"
   optional-pdf:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -38,4 +38,4 @@ jobs:
       - name: Install the tested optional PDF dependency
         run: python -m pip install pymupdf==1.28.2
       - name: Verify optional native PDF cases
-        run: python -B run_tests.py --pattern test_pdf_followup.py
+        run: python -B tools/run_tests.py --pattern test_pdf_followup.py

@@ -15,7 +15,8 @@ import time
 import unittest
 
 GUI_CLASSES = {'WindowActionTests', 'ReviewWindowTests', 'ButtonTests', 'IntakeWidgetTests'}
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'app'))
 
 
 def settle_window(root, ready):
@@ -52,7 +53,7 @@ class IsolatedGuiCase(unittest.TestCase):
     def runTest(self):
         with tempfile.TemporaryDirectory(prefix='pinakeys-gui-result-') as directory:
             result_path = Path(directory) / 'result.json'
-            command = [sys.executable, '-B', str(ROOT / 'run_tests.py'),
+            command = [sys.executable, '-B', str(ROOT / 'tools/run_tests.py'),
                        '--gui-case', self.name, '--report-json', str(result_path)]
             try:
                 result = subprocess.run(command, cwd=ROOT, capture_output=True,

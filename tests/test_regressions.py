@@ -13,12 +13,13 @@ import tempfile
 import time
 import unittest
 from unittest.mock import patch
+from build_usb import RUNTIME, source_file
 
 SOURCE = Path(__file__).resolve().parents[1]
 
 
 def module(name):
-    spec = importlib.util.spec_from_file_location(name, SOURCE / (name + '.py'))
+    spec = importlib.util.spec_from_file_location(name, source_file(name + '.py'))
     result = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(result)
     return result
@@ -30,9 +31,10 @@ class RegressionTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve() / 'USB with spaces'
         self.root.mkdir()
-        for path in SOURCE.iterdir():
-            if path.is_file() and path.suffix in {'.py', '.sh', '.command', '.bat'}:
-                shutil.copy2(path, self.root / path.name)
+        for name in RUNTIME:
+            shutil.copy2(source_file(name), self.root / name)
+        for path in (SOURCE / 'tools').glob('*.py'):
+            shutil.copy2(path, self.root / path.name)
         (self.root / 'Content').mkdir()
         (self.root / 'Incoming Files').mkdir()
         (self.root / 'Content' / 'notes.txt').write_bytes(b'local notes')

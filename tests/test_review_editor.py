@@ -16,7 +16,7 @@ import unittest
 from unittest.mock import patch
 import zipfile
 
-from build_usb import build_folder
+from build_usb import build_folder, source_file
 from run_tests import settle_window
 from library_paths import LibraryPaths
 from pinakeys import ActionRunner, PinakeysWindow
@@ -350,9 +350,8 @@ class ReviewStoreTests(unittest.TestCase):
     def test_flat_kit_backups_are_not_added_to_root_inventory(self):
         flat = Path(self.temp.name).resolve() / 'Flat kit'
         flat.mkdir()
-        source = Path(__file__).resolve().parents[1]
         for name in ('scan_library.py', 'library_paths.py', 'library_style.py', 'review_library.py', 'library_records.py', 'catalogue_settings.py', 'intake_workflow.py', 'audit_materials.py', 'operation_progress.py'):
-            shutil.copyfile(source / name, flat / name)
+            shutil.copyfile(source_file(name), flat / name)
         (flat / 'Content').mkdir()
         epub(flat / 'Content/example.epub', 'Original', 'Author')
         def refresh():

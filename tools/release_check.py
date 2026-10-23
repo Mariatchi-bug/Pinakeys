@@ -6,16 +6,20 @@ from pathlib import Path
 import py_compile
 import tempfile
 
-from build_usb import RUNTIME, DOCS
+from build_usb import RUNTIME, DOCS, SOURCE_MAP
 
-SOURCE_FILES=set(RUNTIME+DOCS+['CHANGELOG.md','CONTRIBUTING.md','build_usb.py','release_check.py','run_tests.py','release_gate.py','RELEASING.md',
+SOURCE_FILES=set(SOURCE_MAP.values()) | set(['CHANGELOG.md','CONTRIBUTING.md','tools/build_usb.py','tools/release_check.py','tools/run_tests.py','tools/release_gate.py','docs/RELEASING.md','RELEASING.md',
     '.github/rulesets/main.json','.github/rulesets/releases.json','.github/dependabot.yml','.github/PULL_REQUEST_TEMPLATE.md','.github/ISSUE_TEMPLATE/bug_report.yml',
     '.github/ISSUE_TEMPLATE/feature_request.yml','.github/ISSUE_TEMPLATE/config.yml',
-    '.gitignore','.gitattributes','.github/workflows/tests.yml','assets/Pinakeys.icns','assets/pinakeys-icon.png',
-    'vendor/pdf_parser.py','vendor/README.md'])
+    '.gitignore','.gitattributes','.github/workflows/tests.yml'])
 SOURCE_FILES.update('tests/'+name for name in ['test_gui_actions.py','test_pdf_followup.py','test_organized_layout.py',
     'test_portability.py','test_review_editor.py','test_regressions.py','test_intake_workflow.py',
-    'test_desktop_launcher.py','test_v1_workflows.py','test_release_safety.py'])
+    'test_desktop_launcher.py','test_v1_workflows.py','test_release_safety.py','test_source_layout.py'])
+
+# Earlier commits can use the flat source names; current tracked files must use
+# SOURCE_FILES exactly. Both sets remain explicit, closed source allowlists.
+HISTORY_FILES = SOURCE_FILES | set(SOURCE_MAP) | {
+    'build_usb.py', 'release_check.py', 'run_tests.py', 'release_gate.py', 'RELEASING.md'}
 
 def kit_files():
     names={'.gitignore','Open Library.html','Library Tools/Start Here.html','Library Tools/Internal/README.txt'}

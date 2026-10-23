@@ -1,7 +1,7 @@
 # Pinakeys 1.0.2
 
 [Download V1.0.2](https://github.com/Mariatchi-bug/Pinakeys/releases/tag/v1.0.2) ·
-[Quick start](QUICKSTART.md) · [Support](SUPPORT.md) · [Security](SECURITY.md) ·
+[Quick start](docs/QUICKSTART.md) · [Support](docs/SUPPORT.md) · [Security](SECURITY.md) ·
 [MIT license](LICENSE)
 
 A portable, offline catalogue of materials you already have. Select folders,
@@ -21,7 +21,7 @@ Download `Pinakeys-1.0.2-USB.zip` from the release page. The source ZIP is for
 developers; GitHub's automatic source downloads are not the ready-made USB kit.
 Keep existing collections in their current folders. Put the kit at their common
 parent on the same drive; do not move books into Content just to catalogue them.
-See [QUICKSTART.md](QUICKSTART.md) for the complete first-use instructions.
+See [QUICKSTART.md](docs/QUICKSTART.md) for the complete first-use instructions.
 
 Requires Python **3.10+**. The desktop app also needs Tkinter (`python3 -m tkinter`
 checks it). Basic inventory and EPUB metadata need only the standard library;
@@ -199,7 +199,7 @@ Optional Dangerzone conversion is a separate CLI action producing new copies;
 it does not rewrite originals.
 
 Security tools are optional and separately installed; see
-[DEPENDENCIES.md](DEPENDENCIES.md). Title/author editing and optional embedded metadata extraction work
+[DEPENDENCIES.md](docs/DEPENDENCIES.md). Title/author editing and optional embedded metadata extraction work
 independently of the security tools.
 
 Optional tools are installed on the computer, not supplied as working binaries
@@ -223,7 +223,8 @@ opening an original delegates to your browser or the computer's file handler.
 
 ## Command line
 
-From the source/flat kit, or `Library Tools/Internal` in an organized kit:
+Run these commands from `Library Tools/Internal` in a built kit, or from a legacy
+flat kit. For development, build a disposable kit first as described below:
 
 ```sh
 python3 scan_library.py --inventory-only --folder 'Research' --folder 'Manuals' --exclude 'Camera' --exclude '*.zip'
@@ -245,6 +246,27 @@ IDs on a clean installation, start with the quick inventory action as above.
 The kit must share a common parent with its folders; absolute external paths and
 symbolic links are refused to preserve portability.
 
+## Repository layout
+
+The source repository and portable USB kit have different layouts:
+
+```text
+Pinakeys/
+├── app/          Application code, icons and bundled parser notices
+├── launchers/    Platform scripts copied into the USB kit
+├── tools/        Build, test and release utilities
+├── docs/         Installation, dependencies and maintenance guides
+├── tests/        Disposable synthetic tests
+└── .github/      Hosted checks, issue templates and repository rules
+```
+
+README, license, security and contribution guidance stay at the top level.
+The root release-guide pointer also preserves existing documentation links.
+Build a new kit for application testing; the source checkout is a development
+workspace. The builder maps these source folders to the portable kit's existing
+`Library Tools/Internal`, platform and Help folders. Repository organization does
+not change a user's library layout.
+
 ## Build, verify and publish
 
 For development, clone the source into its own directory. Do not develop inside
@@ -256,10 +278,10 @@ cd Pinakeys
 ```
 
 ```sh
-python3 -B run_tests.py
-python3 build_usb.py /path/to/NEW-empty-kit
-python3 release_check.py /path/to/NEW-empty-kit
-python3 -B release_gate.py --output /path/to/NEW-release-folder
+python3 -B tools/run_tests.py
+python3 tools/build_usb.py /path/to/NEW-empty-kit
+python3 tools/release_check.py /path/to/NEW-empty-kit
+python3 -B tools/release_gate.py --output /path/to/NEW-release-folder
 ```
 
 The builder refuses existing destinations and never deploys into a personal USB.
@@ -269,11 +291,11 @@ Published assets include the empty kit, source ZIP, file manifest, SHA-256 sums,
 release notes and a verification report with exact coverage and skips. Hosted
 checks cover Python 3.10/3.13 on Mac, Windows and Linux, plus optional PDF support;
 headless Linux GUI and some Windows integration checks remain unverified.
-See [CONTRIBUTING.md](https://github.com/Mariatchi-bug/Pinakeys/blob/main/CONTRIBUTING.md),
-[RELEASE_NOTES.md](RELEASE_NOTES.md) and [FUTURE_WORK.md](FUTURE_WORK.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md),
+[RELEASE_NOTES.md](docs/RELEASE_NOTES.md) and [FUTURE_WORK.md](docs/FUTURE_WORK.md).
 MIT covers Pinakeys' own code; bundled dependency notices remain intact.
-See [SUPPORT.md](SUPPORT.md) for the compatibility contract and upgrades,
-[SECURITY.md](SECURITY.md) for private reporting, and [RELEASING.md](https://github.com/Mariatchi-bug/Pinakeys/blob/main/RELEASING.md)
+See [SUPPORT.md](docs/SUPPORT.md) for the compatibility contract and upgrades,
+[SECURITY.md](SECURITY.md) for private reporting, and [RELEASING.md](docs/RELEASING.md)
 for the clean-commit release gate. Final downloads are built from one accepted
 commit; a hosted pass is separate from hardware verification.
 
@@ -294,7 +316,7 @@ no-replace operation; journals do not protect against hardware/filesystem damage
 Back up materials as well as records. A record backup cannot restore a lost book.
 The app is not a document viewer, malware guarantee, automatic organiser or backup
 system. OCR, full-text search, collections and cloud features are outside V1;
-see [FUTURE_WORK.md](FUTURE_WORK.md).
+see [FUTURE_WORK.md](docs/FUTURE_WORK.md).
 
 For help, [open an issue](https://github.com/Mariatchi-bug/Pinakeys/issues/new/choose)
 with version, OS/Python/Tk details and a minimal synthetic reproduction. Redact

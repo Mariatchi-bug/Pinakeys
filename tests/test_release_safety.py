@@ -138,6 +138,6 @@ class ReleaseSafetyTests(unittest.TestCase):
         env = os.environ.copy();env['PYTHONIOENCODING'] = 'ascii'
         result = subprocess.run([sys.executable, '-B', '-c',
             "from library_paths import configure_console; configure_console(); print('Café — 資料')"],
-            env=env, capture_output=True, timeout=10)
+            cwd=Path(__file__).resolve().parents[1] / 'app', env=env, capture_output=True, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.decode('utf-8').strip(), 'Café — 資料')
