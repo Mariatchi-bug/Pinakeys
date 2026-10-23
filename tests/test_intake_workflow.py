@@ -543,7 +543,8 @@ class IntakeTests(IntakeFixture):
                   'from library_paths import LibraryPaths; from intake_workflow import Intake; '
                   'f=Intake(LibraryPaths(Path(sys.argv[1]),True)); '
                   'f.apply(json.loads(sys.argv[2]),"FILE 1",checkpoint=lambda *args: os._exit(73))')
-        child = subprocess.run([sys.executable, '-B', '-c', script, str(self.root), json.dumps(plan)], capture_output=True, text=True)
+        child = subprocess.run([sys.executable, '-B', '-c', script, str(self.root), json.dumps(plan)],
+                               cwd=self.root / 'Library Tools/Internal', capture_output=True, text=True)
         self.assertEqual(child.returncode, 73, child.stderr)
         moved_root = self.root.with_name('Reconnected drive')
         self.root.rename(moved_root)

@@ -12,10 +12,10 @@ import sys
 import tempfile
 import zipfile
 
-from build_usb import build_folder, RUNTIME
-from release_check import inspect, SOURCE_FILES, kit_files
+from build_usb import build_folder, RUNTIME, source_file
+from release_check import inspect, SOURCE_FILES, HISTORY_FILES, kit_files
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def command(args, **kwargs):
@@ -40,7 +40,7 @@ def source_history():
         for row in filter(None, rows):
             metadata, name = row.split('\t', 1)
             mode, kind, sha = metadata.split()
-            if name not in SOURCE_FILES or kind != 'blob' or mode == '120000':
+            if name not in HISTORY_FILES or kind != 'blob' or mode == '120000':
                 raise ValueError('Unreviewed historical path: ' + name)
             objects.add(sha)
         identities.update(command(['git', 'show', '-s', '--format=%ae%n%ce', commit]).splitlines())
@@ -149,7 +149,7 @@ def build_release(output):
     history = source_history()
     version = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
     from catalogue_settings import VERSION
-    if version != VERSION or command([sys.executable, '-B', 'pinakeys.py', '--version']) != 'Pinakeys ' + version:
+    if version != VERSION or command([sys.executable, '-B', 'app/pinakeys.py', '--version']) != 'Pinakeys ' + version:
         raise ValueError('Version sources disagree.')
     output = Path(output).resolve();output.mkdir(parents=True, exist_ok=False)
     commit = command(['git', 'rev-parse', 'HEAD'])
@@ -166,7 +166,7 @@ def build_release(output):
             archive.extractall(temp)
         extracted = Path(temp) / prefix.rstrip('/')
         rebuilt = Path(temp) / 'Rebuilt kit'
-        command([sys.executable, '-B', str(extracted / 'build_usb.py'), str(rebuilt)])
+        command([sys.executable, '-B', str(extracted / 'tools/build_usb.py'), str(rebuilt)])
         rebuilt_manifest = inspect(rebuilt)
         if rebuilt_manifest['files'] != manifest['files']:
             raise ValueError('Kit differs from its clean source-archive rebuild.')
@@ -187,7 +187,7 @@ def build_release(output):
               'contents': manifest, 'clean_source_rebuild': 'passed', 'zip_integrity': 'passed',
               'package_status': 'verified'}
     (output/'CONTENTS.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-    shutil.copyfile(ROOT/'RELEASE_NOTES.md',output/'RELEASE_NOTES.md')
+    shutil.copyfile(source_file('RELEASE_NOTES.md'),output/'RELEASE_NOTES.md')
     sums=[]
     for path in [source,usb,output/'CONTENTS.json',output/'RELEASE_NOTES.md']:
         sums.append(hashlib.sha256(path.read_bytes()).hexdigest()+'  '+path.name)

@@ -1,12 +1,12 @@
 # Dependencies and notices
 
-Pinakeys' own source is MIT licensed; see LICENSE. Python, Tcl/Tk and optional
+Pinakeys' own source is MIT licensed; see [LICENSE](../LICENSE). Python, Tcl/Tk and optional
 external tools retain their own licenses. The empty kit contains no Python
 runtime, AV database, Java runtime, optional Python package or conversion VM.
 
 The one bundled code dependency is `vendor/pdf_parser.py` (Didier Stevens'
 pdf-parser.py 0.7.14), with its public-domain notice and included LZW decoder's
-permissive copyright/license retained verbatim. See vendor/README.md for the
+permissive copyright/license retained verbatim. See the [bundled parser notice](../app/vendor/README.md) for the
 pinned source commit, checksum and upstream links. The runtime checks its hash.
 
 | Optional tool | Used for | Upstream information |

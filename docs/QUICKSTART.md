@@ -29,6 +29,6 @@
    from backup can load Record History or a full JSON export without moving books.
 
 Check Incoming, optional tool installation, metadata extraction, PDF follow-up,
-previewed filing and undo are separate actions described in README. Nothing
+previewed filing and undo are separate actions described in the [full guide](../README.md). Nothing
 starts a security check merely by opening the app or catalogue. Completed checks
 never certify safety. Do not test installations against your only material copy.

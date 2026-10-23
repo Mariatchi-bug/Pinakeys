@@ -3,9 +3,13 @@ import argparse
 from pathlib import Path
 import shutil
 import plistlib
-from library_style import BASE_CSS
+import re
+import sys
+from urllib.parse import unquote, urlsplit, urlunsplit
 
-SOURCE = Path(__file__).resolve().parent
+SOURCE = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SOURCE / 'app'))
+from library_style import BASE_CSS
 DOCS = ['README.md', 'LICENSE', 'QUICKSTART.md', 'VERSION', 'DEPENDENCIES.md', 'RELEASE_NOTES.md', 'FUTURE_WORK.md', 'SECURITY.md', 'SUPPORT.md']
 RUNTIME = [
     'scan_library.py', 'audit_materials.py', 'sanitize_with_dangerzone.py', 'library_paths.py', 'library_style.py', 'pinakeys.py', 'review_library.py',
@@ -15,6 +19,43 @@ RUNTIME = [
     'Run safety audit (Windows).bat',
     'Install PDF metadata support (Mac-Linux).sh', 'Install PDF metadata support (Windows).bat',
 ]
+
+# Repository paths are independent of the names used inside the portable kit.
+SOURCE_MAP = {name: ('app/' if name.endswith('.py') else 'launchers/') + name for name in RUNTIME}
+SOURCE_MAP.update({name: name if name in {'README.md', 'LICENSE', 'VERSION', 'SECURITY.md'}
+                   else 'docs/' + name for name in DOCS})
+SOURCE_MAP.update({name: 'app/' + name for name in
+                   ['vendor/pdf_parser.py', 'vendor/README.md', 'assets/pinakeys-icon.png', 'assets/Pinakeys.icns']})
+SOURCE_MAP['.gitignore'] = 'tools/usb.gitignore'
+
+
+def source_file(name):
+    return SOURCE / SOURCE_MAP[name]
+
+
+def help_document(name):
+    """Keep copied help links local despite different source documentation paths."""
+    source = source_file(name)
+    text = source.read_text(encoding='utf-8')
+    destinations = {source_file(doc).resolve(): doc for doc in DOCS}
+    destinations[source_file('vendor/README.md').resolve()] = '../Internal/vendor/README.md'
+
+    def link(match):
+        target = urlsplit(match.group(2))
+        if target.scheme or target.netloc or not target.path:
+            return match.group(0)
+        path = (source.parent / unquote(target.path)).resolve()
+        if path in destinations:
+            href = urlunsplit(('', '', destinations[path], target.query, target.fragment))
+        elif path.is_relative_to(SOURCE) and path.is_file():
+            href = 'https://github.com/Mariatchi-bug/Pinakeys/blob/main/' + path.relative_to(SOURCE).as_posix()
+            if target.fragment:
+                href += '#' + target.fragment
+        else:
+            return match.group(0)
+        return match.group(1) + href + match.group(3)
+
+    return re.sub(r'(\[[^\]\n]*\]\()([^\s)]+)(\))', link, text)
 
 START_HERE = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pinakeys 1.0.2 · Tools and help</title><style>__SHARED_STYLE__ body{max-width:1000px;line-height:1.65}.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}h2{font-size:22px}@media(max-width:700px){.grid{display:block}}</style><header class="site-header"><span class="brand">Pinakeys 1.0.2</span><a href="../Open%20Library.html">Your catalogue</a></header><main><h1>Your materials, where you keep them.</h1><p>Open Pinakeys from the Mac folder. Windows and Linux/uConsole launchers are experimental. Python 3.10+ and Tkinter are required for the app.</p><p><a href="Help/QUICKSTART.md">First-use instructions</a> · <a href="Help/README.md">Full guide</a></p><div class="grid"><section><h2>Catalogue existing folders</h2><p>Choose <strong>Folders and exclusions…</strong>, select collections inside this kit’s common parent, and save. No file reorganization is needed. <strong>Refresh Catalogue</strong> lists paths and attributes quickly. <strong>Open Library</strong> lets you search and open originals offline.</p><p><strong>Full verification…</strong> is a separate action that reads the selected files completely. Use it after renames/moves or to detect changed bytes. Cached attributes are not proof. Stop Current Action cancels a running verification.</p></section><section><h2>Correct and recover</h2><p><strong>Review Files</strong> opens populated title/author fields. Untick Needs review only to see every entry. Saving verifies that file and keeps corrections separate from the document.</p><p>Keep <strong>Settings</strong> and <strong>Corrections</strong> with the drive. <strong>Restore records from backup…</strong> restores a full saved JSON ledger with a backup of the current one. Missing and unmatched records are retained.</p></section><section><h2>Optional intake</h2><p><strong>Check Incoming → Intake · Review and File… → Preview → Confirm filing</strong>. The audit reports actual tool coverage and separate formatting, incomplete-check, security, metadata and duplicate findings. A completed run is not a safety certificate.</p><p>Filing requires typing FILE N; undo requires UNDO N. Journals support recovery after interruption. Deeper PDF Check is a separate explicit follow-up; no original is rewritten.</p></section><section><h2>Portable views</h2><p>These links become available after the first update:</p><ul><li><a href="Reports/library_mobile.html">Simple HTML view</a></li><li><a href="Reports/catalogue.csv">CSV</a> · <a href="Reports/catalogue.json">JSON</a> · <a href="Reports/catalogue.txt">Text</a></li></ul><p><a href="Help/DEPENDENCIES.md">Optional dependencies and notices</a> · <a href="Help/LICENSE">MIT license</a></p></section></div></main></html>'''.replace('__SHARED_STYLE__', BASE_CSS)
 
@@ -29,18 +70,22 @@ def build_folder(destination):
     internal = destination / 'Library Tools/Internal'
     for name in RUNTIME:
         if name.endswith('.bat'):
-            data = (SOURCE / name).read_bytes().replace(b'\r\n', b'\n')
+            data = source_file(name).read_bytes().replace(b'\r\n', b'\n')
             (internal / name).write_bytes(data.replace(b'\n', b'\r\n'))
         else:
-            shutil.copyfile(SOURCE / name, internal / name)
+            shutil.copyfile(source_file(name), internal / name)
     (internal / 'vendor').mkdir()
     for name in ('pdf_parser.py', 'README.md'):
-        shutil.copyfile(SOURCE / 'vendor' / name, internal / 'vendor' / name)
+        shutil.copyfile(source_file('vendor/' + name), internal / 'vendor' / name)
     (internal / 'assets').mkdir()
-    shutil.copyfile(SOURCE / 'assets/pinakeys-icon.png', internal / 'assets/pinakeys-icon.png')
+    shutil.copyfile(source_file('assets/pinakeys-icon.png'), internal / 'assets/pinakeys-icon.png')
     for name in DOCS:
-        shutil.copyfile(SOURCE / name, destination / 'Library Tools/Help' / name)
-    shutil.copyfile(SOURCE / '.gitignore', destination / '.gitignore')
+        target = destination / 'Library Tools/Help' / name
+        if name.endswith('.md'):
+            target.write_bytes(help_document(name).encode('utf-8'))
+        else:
+            shutil.copyfile(source_file(name), target)
+    shutil.copyfile(source_file('.gitignore'), destination / '.gitignore')
     (destination / 'Library Tools/Start Here.html').write_text(START_HERE, encoding='utf-8')
     (destination / 'Library Tools/Internal/README.txt').write_text(
         'These files support the actions in Mac, Windows and Linux. Leave this folder in place.\n'
@@ -94,7 +139,7 @@ def build_desktop_launchers(destination):
     app = tools / 'Mac/Pinakeys.app/Contents'
     (app / 'MacOS').mkdir(parents=True)
     (app / 'Resources').mkdir()
-    shutil.copyfile(SOURCE / 'assets/Pinakeys.icns', app / 'Resources/Pinakeys.icns')
+    shutil.copyfile(source_file('assets/Pinakeys.icns'), app / 'Resources/Pinakeys.icns')
     (app / 'Info.plist').write_bytes(plistlib.dumps({
         'CFBundleName': 'Pinakeys', 'CFBundleDisplayName': 'Pinakeys',
         'CFBundleIdentifier': 'org.pinakeys.launcher', 'CFBundleExecutable': 'Pinakeys',

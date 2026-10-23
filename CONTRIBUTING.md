@@ -5,11 +5,16 @@ collections; never use personal books or a real USB as a test fixture. Ordinary
 cataloguing leaves materials in place. Confirmed intake moves/undo are tested
 only on disposable copies. Preserve independent corrections and unknown fields.
 
-Run `python3 -B run_tests.py`. No third-party packages are
+Run `python3 -B tools/run_tests.py`. No third-party packages are
 required for core tests. The runner isolates every native Tk case in a fresh process to match the app's single-interpreter lifetime. Native Tk tests skip only if a display/Tk is unavailable;
 report skips honestly. Fake security tools verify contracts, not detection rates.
 Run targeted tests while changing behavior; once stable, run the whole suite and
 clean-build gate. Repeat broad checks only after subsequent relevant changes.
+
+Application sources and bundled resources live in `app/`; `launchers/` holds
+platform scripts, `tools/` holds developer commands and `docs/` holds detailed
+guides. Runtime files are copied into disposable kits before testing file actions.
+The builder preserves the portable kit layout.
 
 The GitHub test matrix uses Python 3.10/3.13 on macOS, Windows and Linux.
 A local macOS pass does not establish Windows/Linux/uConsole device support or
@@ -19,9 +24,9 @@ Do not widen those claims merely because portable path tests pass.
 A local release gate is:
 
 ```sh
-python3 -B run_tests.py
-python3 build_usb.py /path/to/NEW-empty-kit
-python3 release_check.py /path/to/NEW-empty-kit
+python3 -B tools/run_tests.py
+python3 tools/build_usb.py /path/to/NEW-empty-kit
+python3 tools/release_check.py /path/to/NEW-empty-kit
 ```
 
 Check installation from QUICKSTART using a fresh disposable copy of the kit.
@@ -44,7 +49,8 @@ publish versioned releases after the required checks pass. Published tags and
 assets are fixed; compatible corrections receive a new 1.0.x version.
 Future features belong in FUTURE_WORK.md and should be scoped separately.
 
-Use release_gate.py from a clean committed checkout for the full package and
-installation gate. See RELEASING.md, SUPPORT.md and SECURITY.md. Issue/PR forms
+Use tools/release_gate.py from a clean committed checkout for the full package and
+installation gate. See the [release guide](docs/RELEASING.md), [support contract](docs/SUPPORT.md)
+and [security policy](SECURITY.md). Issue/PR forms
 require synthetic reproductions and redacted diagnostics. Public history must
 preserve contributor attribution; never rewrite it without consent.
