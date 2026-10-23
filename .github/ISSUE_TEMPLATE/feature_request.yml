@@ -1,0 +1,14 @@
+name: Feature request
+description: Describe a user problem and its relationship to the scoped catalogue.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Existing workflow and smallest useful change
+      description: V1 focuses on an offline catalogue, portable records and optional intake. Broader ideas may be deferred.

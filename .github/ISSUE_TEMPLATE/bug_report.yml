@@ -1,0 +1,31 @@
+name: Bug report
+description: Report a reproducible problem without sharing personal materials.
+body:
+  - type: markdown
+    attributes:
+      value: Please use synthetic files and redact paths. Do not attach books, catalogues, corrections or credentials. Report vulnerabilities privately through SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: Pinakeys version and installation type
+      placeholder: 1.0.2 empty USB kit
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS, Python and Tcl/Tk versions
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Minimal synthetic reproduction
+      description: Include expected and actual behavior, and whether records or files changed.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostics
+      description: Do not paste full private file lists or document contents.

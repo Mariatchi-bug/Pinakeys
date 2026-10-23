@@ -1,0 +1,11 @@
+* text=auto
+*.py text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.command text eol=lf
+*.bat text eol=crlf
+.gitignore text eol=lf
+VERSION text eol=lf
+LICENSE text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf

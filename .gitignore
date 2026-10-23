@@ -1,0 +1,87 @@
+# Default deny: a USB may contain personal files under ANY folder name.
+# Only these reviewed source files belong in the public repository.
+*
+!.gitignore
+!.gitattributes
+!README.md
+!LICENSE
+!CHANGELOG.md
+!CONTRIBUTING.md
+!scan_library.py
+!audit_materials.py
+!pdf_followup.py
+!pdf_inspection.py
+!vendor/
+vendor/*
+!vendor/pdf_parser.py
+!vendor/README.md
+!sanitize_with_dangerzone.py
+!library_paths.py
+!library_style.py
+!build_usb.py
+!pinakeys.py
+!review_library.py
+!library_records.py
+!intake_workflow.py
+!intake_ui.py
+!assets/
+assets/*
+!assets/pinakeys-icon.png
+!assets/Pinakeys.icns
+!Run on Mac.command
+!Run on Linux.sh
+!Run on Windows.bat
+!Run safety audit (Mac).command
+!Run safety audit (Linux).sh
+!Run safety audit (Windows).bat
+!Install PDF metadata support (Mac-Linux).sh
+!Install PDF metadata support (Windows).bat
+!tests/
+tests/*
+!tests/test_portability.py
+!tests/test_regressions.py
+!tests/test_organized_layout.py
+!tests/test_desktop_launcher.py
+!tests/test_gui_actions.py
+!tests/test_review_editor.py
+!tests/test_intake_workflow.py
+!tests/test_pdf_followup.py
+!.github/
+.github/*
+!.github/workflows/
+.github/workflows/*
+!.github/workflows/tests.yml
+
+# Ignore rules cannot protect already tracked files or git add -f.
+# Inspect git ls-files before any publication.
+
+# Catalogue, records and distribution sources
+!catalogue_settings.py
+!record_backup.py
+!release_check.py
+!QUICKSTART.md
+!DEPENDENCIES.md
+!VERSION
+!RELEASE_NOTES.md
+!FUTURE_WORK.md
+!tests/test_v1_workflows.py
+!operation_progress.py
+
+!run_tests.py
+!SECURITY.md
+!SUPPORT.md
+!RELEASING.md
+!release_gate.py
+!tests/test_release_safety.py
+!.github/dependabot.yml
+!.github/PULL_REQUEST_TEMPLATE.md
+!.github/ISSUE_TEMPLATE/
+.github/ISSUE_TEMPLATE/*
+!.github/ISSUE_TEMPLATE/bug_report.yml
+!.github/ISSUE_TEMPLATE/feature_request.yml
+!.github/ISSUE_TEMPLATE/config.yml
+
+!.github/rulesets/
+.github/rulesets/*
+!.github/rulesets/main.json
+!.github/rulesets/releases.json
